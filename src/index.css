@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-violet: #6D28D9;
+  --color-brand-violet-light: #DDD6FE;
+  --color-brand-pink: #FDF2F8;
+  --color-brand-pink-dark: #F472B6;
+  --color-brand-dark: #1E1B4B;
+  --color-brand-text: #312E81;
+  --color-brand-green: #22C55E;
+  --color-brand-red: #EF4444;
+  --color-brand-gold: #D4AF37;
+}
+
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #1a1a1a;
+  background-color: #F8F9FA;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Custom Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.card-premium {
+  @apply bg-white rounded-[2rem] shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] p-8 border border-gray-100/50 transition-all duration-300;
+}
+
+.card-premium:hover {
+  @apply shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] -translate-y-1;
+}
+
+.btn-modern {
+  @apply px-6 py-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2 active:scale-95;
+}
+
+.input-modern {
+  @apply w-full p-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-brand-violet/20 focus:bg-white outline-none transition-all text-gray-700;
+}
+
+.glow-selected {
+  box-shadow: 0 0 20px rgba(109, 40, 217, 0.4);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #E5E7EB;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D1D5DB;
+}
