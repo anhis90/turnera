@@ -1,7 +1,8 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   ChevronRight, Sparkles, Home, ClipboardList, Layout, 
-  Camera, Info, ChevronLeft, Lock, LogOut 
+  Camera, Info, Settings, ChevronLeft 
 } from 'lucide-react';
 
 const SidebarItem = ({ icon, label, active, onClick, isCollapsed }) => (
@@ -25,7 +26,7 @@ const SidebarItem = ({ icon, label, active, onClick, isCollapsed }) => (
   </button>
 );
 
-export const Sidebar = ({ view, setView, isSidebarOpen, setIsSidebarOpen, isAdmin, handleAdminAccess, handleAdminLogout }) => {
+export const Sidebar = ({ view, setView, isSidebarOpen, setIsSidebarOpen, isAdmin, setIsAdmin }) => {
   return (
     <aside className={`fixed left-0 top-0 h-screen bg-brand-dark text-white p-6 flex flex-col z-50 shadow-2xl transition-all duration-500 ${isSidebarOpen ? 'w-72' : 'w-20'}`}>
       <button 
@@ -60,29 +61,21 @@ export const Sidebar = ({ view, setView, isSidebarOpen, setIsSidebarOpen, isAdmi
         <SidebarItem icon={<Info size={20}/>} label="Sobre Nosotros" active={view === 'about'} onClick={() => setView('about')} isCollapsed={!isSidebarOpen} />
       </nav>
 
-      <div className="pt-8 border-t border-white/10 space-y-3">
+      <div className="pt-8 border-t border-white/10 space-y-4">
         <button 
           className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 font-bold text-sm group relative overflow-hidden ${
             view === 'admin' 
               ? 'bg-brand-violet text-white shadow-xl shadow-brand-violet/40' 
               : 'bg-brand-violet/10 text-white/90 border border-brand-violet/20 hover:bg-brand-violet/20'
           }`} 
-          onClick={handleAdminAccess}
+          onClick={() => {
+            setView('admin-login');
+          }}
         >
-          <Lock size={18} className={view === 'admin' ? 'text-white' : 'text-brand-violet'} />
-          {isSidebarOpen && <span>{isAdmin ? 'Panel Admin' : 'Acceso Admin'}</span>}
+          <Settings size={18} className={view === 'admin' ? 'text-white' : 'text-brand-violet'} />
+          {isSidebarOpen && <span>Panel Admin</span>}
           {view === 'admin' && isSidebarOpen && <ChevronRight size={16} className="ml-auto opacity-50" />}
         </button>
-
-        {isAdmin && (
-          <button
-            onClick={handleAdminLogout}
-            className="w-full flex items-center gap-4 px-5 py-3 rounded-2xl transition-all duration-300 font-bold text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/10 group"
-          >
-            <LogOut size={16} />
-            {isSidebarOpen && <span>Cerrar Sesión</span>}
-          </button>
-        )}
       </div>
     </aside>
   );
