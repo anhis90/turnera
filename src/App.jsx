@@ -2,7 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Calendar as CalendarIcon, Clock, Sparkles,
-  CheckCircle2, Menu, X, Phone, MapPin, Eye, FileText
+  CheckCircle2, Menu, X, Phone, MapPin, Eye, FileText,
+  Lock, ShieldCheck, LogOut
 } from 'lucide-react';
 import { format, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -28,6 +29,41 @@ function App() {
   const [view, setView] = useState('booking');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Admin authentication state
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminError, setAdminError] = useState('');
+  const ADMIN_PASSWORD = 'turnera2026';
+
+  const handleAdminAccess = () => {
+    if (isAdmin) {
+      setView('admin');
+      return;
+    }
+    setShowAdminLogin(true);
+    setAdminPassword('');
+    setAdminError('');
+  };
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (adminPassword === ADMIN_PASSWORD) {
+      setIsAdmin(true);
+      setShowAdminLogin(false);
+      setView('admin');
+      setAdminPassword('');
+      setAdminError('');
+    } else {
+      setAdminError('Contraseña incorrecta. Acceso denegado.');
+      setAdminPassword('');
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdmin(false);
+    setView('booking');
+  };
 
   // Booking State
   const [selectedService, setSelectedService] = useState(null);
@@ -161,7 +197,8 @@ function App() {
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
           isAdmin={isAdmin}
-          setIsAdmin={setIsAdmin}
+          handleAdminAccess={handleAdminAccess}
+          handleAdminLogout={handleAdminLogout}
         />
       </div>
 
@@ -203,11 +240,20 @@ function App() {
             </nav>
             <div className="pb-10 border-t border-white/10 pt-6">
               <button
-                onClick={() => { setIsAdmin(!isAdmin); setView('admin'); setIsMobileMenuOpen(false); }}
-                className="w-full p-6 rounded-2xl bg-brand-violet/10 border border-brand-violet/20 text-brand-violet font-black uppercase tracking-widest"
+                onClick={() => { handleAdminAccess(); setIsMobileMenuOpen(false); }}
+                className="w-full p-6 rounded-2xl bg-brand-violet/10 border border-brand-violet/20 text-brand-violet font-black uppercase tracking-widest flex items-center justify-center gap-3"
               >
-                Panel Administrador
+                <Lock size={18} />
+                {isAdmin ? 'Panel Administrador' : 'Acceso Admin'}
               </button>
+              {isAdmin && (
+                <button
+                  onClick={() => { handleAdminLogout(); setIsMobileMenuOpen(false); }}
+                  className="w-full mt-3 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2"
+                >
+                  <LogOut size={16} /> Cerrar Sesión Admin
+                </button>
+              )}
             </div>
           </motion.div>
         )}
@@ -422,7 +468,7 @@ function App() {
 
           {view === 'promotions' && <Promotions key="promotions" />}
 
-          {view === 'admin' && <AdminPanel bookings={bookings} setBookings={handleSetBookings} />}
+          {view === 'admin' && isAdmin && <AdminPanel bookings={bookings} setBookings={handleSetBookings} />}
 
           {view === 'about' && (
             <motion.div key="about" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
@@ -478,6 +524,97 @@ function App() {
                   <p className="text-gray-400 font-medium italic text-lg">"Tu momento de belleza está confirmado. Te esperamos con amor."</p>
                 </div>
                 <div className="w-16 h-2 bg-brand-violet/20 rounded-full mx-auto animate-pulse"></div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Admin Login Modal */}
+        <AnimatePresence>
+          {showAdminLogin && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-brand-dark/90 backdrop-blur-lg flex items-center justify-center z-[210] p-6"
+              onClick={() => setShowAdminLogin(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, y: 30 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 30 }}
+                className="bg-white rounded-[2.5rem] max-w-md w-full overflow-hidden shadow-2xl border border-gray-100"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="p-10 text-center space-y-8">
+                  {/* Lock Icon */}
+                  <div className="relative mx-auto w-20 h-20">
+                    <div className="w-20 h-20 bg-brand-violet/10 text-brand-violet rounded-full flex items-center justify-center shadow-inner">
+                      <Lock size={36} />
+                    </div>
+                    <motion.div
+                      animate={{ scale: [1, 1.5], opacity: [0.3, 0] }}
+                      transition={{ repeat: Infinity, duration: 2, ease: "easeOut" }}
+                      className="absolute inset-0 bg-brand-violet/10 rounded-full"
+                    />
+                  </div>
+
+                  {/* Title */}
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-black font-serif text-brand-dark">Acceso Administrador</h3>
+                    <p className="text-xs text-gray-400 font-medium leading-relaxed">
+                      Ingresá la contraseña para acceder al panel de gestión de turnos.
+                    </p>
+                  </div>
+
+                  {/* Login Form */}
+                  <form onSubmit={handleAdminLogin} className="space-y-5">
+                    <div className="relative group">
+                      <Lock size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-violet transition-colors" />
+                      <input
+                        id="admin-password"
+                        name="admin-password"
+                        required
+                        type="password"
+                        placeholder="Contraseña"
+                        value={adminPassword}
+                        onChange={(e) => { setAdminPassword(e.target.value); setAdminError(''); }}
+                        autoFocus
+                        className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-violet/20 focus:bg-white p-5 pl-14 rounded-3xl outline-none transition-all font-bold text-sm text-brand-dark"
+                      />
+                    </div>
+
+                    {/* Error Message */}
+                    <AnimatePresence>
+                      {adminError && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="flex items-center justify-center gap-2 text-red-500 text-xs font-bold bg-red-50 p-3 rounded-2xl"
+                        >
+                          <X size={14} />
+                          {adminError}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    <button
+                      type="submit"
+                      className="w-full py-5 rounded-2xl bg-brand-violet text-white font-black text-xs uppercase tracking-widest hover:bg-brand-dark transition-all cursor-pointer shadow-lg shadow-brand-violet/20 flex items-center justify-center gap-3"
+                    >
+                      <ShieldCheck size={18} />
+                      Ingresar al Panel
+                    </button>
+                  </form>
+
+                  <button
+                    onClick={() => setShowAdminLogin(false)}
+                    className="text-[10px] text-gray-400 hover:text-brand-violet font-black uppercase tracking-widest transition-colors cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                </div>
               </motion.div>
             </motion.div>
           )}
